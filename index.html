@@ -1,3 +1,5 @@
+echo "// cambio de prueba" >> README.md
+
 <!doctype html>
 <html lang="es">
 	<head>
@@ -5,6 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Itinerario y Mapa de Colombia (Live)</title>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/styles.css" rel="stylesheet">
 		<script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
 	</head>
 	<body class="p-3">
@@ -16,7 +19,7 @@
 						<div class="card-body">
 							<form id="itinerarioForm">
 								<div class="mb-3">
-									<label class="form-label">Aeropuerto de salida (lat,lon)</label>
+									<label class="form-label">Aeropuerto de salidas (lat,lon)</label>
 									<input type="text" class="form-control" id="dep" placeholder="Ej: 4.70159,-74.07209">
 									<div class="form-text">Formato: lat,lon (ejemplo: Bogotá 4.7016,-74.0721)</div>
 								</div>
@@ -37,7 +40,7 @@
 					<div class="card">
 						<div class="card-header">Mapa (Plotly)</div>
 						<div class="card-body">
-							<div id="plot" style="width:100%;height:600px;"></div>
+							<div id="plot"></div>
 						</div>
 					</div>
 				</div>
