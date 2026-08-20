@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Itinerario y Mapa de Colombia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="p-3">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">Crear itinerario</div>
+            <div class="card-body">
+              <form id="itinerarioForm">
+                <div class="mb-3">
+                  <label class="form-label">Aeropuerto de salida (lat,lon)</label>
+                  <input type="text" class="form-control" id="dep" placeholder="Ej: 4.70159,-74.07209">
+                  <div class="form-text">Formato: lat,lon (ejemplo: Bogotá 4.7016,-74.0721)</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Aeropuerto de llegada (lat,lon)</label>
+                  <input type="text" class="form-control" id="arr" placeholder="Ej: 10.39105,-75.47943">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Intensidad horaria</label>
+                  <input type="number" class="form-control" id="intensity" min="0" max="100" value="5">
+                </div>
+                <button type="submit" class="btn btn-primary">Generar mapa</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header">Mapa (matplotlib)</div>
+            <div class="card-body text-center">
+              <img id="mapImg" src="/map.png" alt="Mapa de Colombia" class="img-fluid border">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('itinerarioForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const dep = document.getElementById('dep').value;
+        const arr = document.getElementById('arr').value;
+        const intensity = document.getElementById('intensity').value;
+        const img = document.getElementById('mapImg');
+        const params = new URLSearchParams({dep, arr, intensity});
+        img.src = '/map.png?' + params.toString() + '&_=' + Date.now();
+      });
+    </script>
+  </body>
+</html>

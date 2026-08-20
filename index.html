@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Itinerario y Mapa de Colombia (Live)</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+		<script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
+	</head>
+	<body class="p-3">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-4">
+					<div class="card">
+						<div class="card-header">Crear itinerario</div>
+						<div class="card-body">
+							<form id="itinerarioForm">
+								<div class="mb-3">
+									<label class="form-label">Aeropuerto de salida (lat,lon)</label>
+									<input type="text" class="form-control" id="dep" placeholder="Ej: 4.70159,-74.07209">
+									<div class="form-text">Formato: lat,lon (ejemplo: Bogotá 4.7016,-74.0721)</div>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Aeropuerto de llegada (lat,lon)</label>
+									<input type="text" class="form-control" id="arr" placeholder="Ej: 10.39105,-75.47943">
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Intensidad horaria</label>
+									<input type="number" class="form-control" id="intensity" min="0" max="100" value="5">
+								</div>
+								<button type="submit" class="btn btn-primary">Generar mapa</button>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-8">
+					<div class="card">
+						<div class="card-header">Mapa (Plotly)</div>
+						<div class="card-body">
+							<div id="plot" style="width:100%;height:600px;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Simplified polygon for Colombia (lon, lat)
+			const colombia = [
+				[-79.0, 12.5], [-75.0, 11.5], [-72.0, 9.0], [-70.0, 4.0],
+				[-73.0, -3.5], [-76.0, -4.2], [-78.0, -1.0], [-80.0, 2.0],
+				[-82.0, 7.0], [-82.0, 11.0], [-79.0, 12.5]
+			];
+
+			const lons = colombia.map(p => p[0]);
+			const lats = colombia.map(p => p[1]);
+
+			function draw(dep, arr, intensity){
+				const traces = [];
+
+				// polygon
+				traces.push({
+					x: lons,
+					y: lats,
+					fill: 'toself',
+					fillcolor: '#cce5ff',
+					line: {color: '#2b7bba'},
+					type: 'scatter',
+					name: 'Colombia'
+				});
+
+				// departure
+				if(dep){
+					traces.push({
+						x: [dep.lon],
+						y: [dep.lat],
+						mode: 'markers+text',
+						marker: {color: 'red', size: 8 + (intensity||0)},
+						text: ['Salida'],
+						textposition: 'top right',
+						name: 'Salida'
+					});
+				}
+
+				// arrival
+				if(arr){
+					traces.push({
+						x: [arr.lon],
+						y: [arr.lat],
+						mode: 'markers+text',
+						marker: {color: 'green', size: 8 + (intensity||0)},
+						text: ['Llegada'],
+						textposition: 'top right',
+						name: 'Llegada'
+					});
+				}
+
+				const layout = {
+					xaxis: {range: [-82, -66], title: 'Longitud'},
+					yaxis: {range: [-5, 13], title: 'Latitud', scaleanchor: 'x', scaleratio: 1},
+					title: 'Mapa aproximado de Colombia',
+					showlegend: true,
+					margin: {t:50, r:10, l:50, b:40}
+				};
+
+				Plotly.react('plot', traces, layout, {responsive: true});
+			}
+
+			function parseCoord(text){
+				if(!text) return null;
+				const parts = text.split(',').map(s=>s.trim());
+				if(parts.length !== 2) return null;
+				const a = parseFloat(parts[0]);
+				const b = parseFloat(parts[1]);
+				if(isNaN(a) || isNaN(b)) return null;
+				// assume input is lat,lon -> convert to lon/lat
+				return {lat: a, lon: b};
+			}
+
+			document.getElementById('itinerarioForm').addEventListener('submit', function(e){
+				e.preventDefault();
+				const depTxt = document.getElementById('dep').value;
+				const arrTxt = document.getElementById('arr').value;
+				const intensity = parseFloat(document.getElementById('intensity').value) || 0;
+				const dep = parseCoord(depTxt);
+				const arr = parseCoord(arrTxt);
+				if((depTxt && !dep) || (arrTxt && !arr)){
+					alert('Formato de coordenadas incorrecto. Usa lat,lon (ej: 4.7016,-74.0721)');
+					return;
+				}
+				draw(dep, arr, intensity);
+			});
+
+			// initial draw
+			draw(null, null, 0);
+		</script>
+	</body>
+</html>
